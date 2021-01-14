@@ -1,14 +1,13 @@
 package br.com.itauchallenge.itauchallengeapi.controller;
 
-import br.com.itauchallenge.itauchallengeapi.model.PasswordDto;
-import br.com.itauchallenge.itauchallengeapi.utils.ValidateRepeatChar;
+import br.com.itauchallenge.itauchallengeapi.dto.PasswordDto;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/itau-challenge")
@@ -16,7 +15,14 @@ public class PasswordController {
 
     @PostMapping("/password-validate")
     public ResponseEntity<?> passwordValidate(@RequestBody @Valid PasswordDto input) {
-        boolean hasRepeted = new ValidateRepeatChar().hasRepeted(input.getPassword());
-        return hasRepeted ? ResponseEntity.badRequest().build() : ResponseEntity.ok().build();
+        Map<String, String> success = new HashMap<>();
+        success.put("message", "Sua senha atende aos criterios de validação.");
+        return ResponseEntity.ok(success);
     }
+
+    @InitBinder("passwordDto")
+    public void customize(WebDataBinder binder) {
+        binder.addValidators(new PasswordValidation());
+    }
+
 }
